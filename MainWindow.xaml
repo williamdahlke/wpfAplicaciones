@@ -3,18 +3,67 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Wisdom" xmlns:models="clr-namespace:Wisdom.Models"
+        xmlns:local="clr-namespace:Wisdom" xmlns:models="clr-namespace:Wisdom.Models" xmlns:converters="clr-namespace:Wisdom.Converters"
         mc:Ignorable="d"
         Title="Window Pet Medicine" Height="450" Width="800">
-    <Window.Resources>
+   <!--<Window.Resources>
         <models:Product x:Key="product1" Name="Collar para perro" Description="Collar para perro color rojo"/>
+        <models:DataSource x:Key="datasource1"></models:DataSource>
+    </Window.Resources>-->
+
+    <Window.DataContext>
+        <models:DataSource></models:DataSource>
+    </Window.DataContext>
+
+    <Window.Resources>
+        <converters:NameConverter x:Key="NameConverter"/>
+        <converters:PriceConverter x:Key="PriceConverter"/>
+        <DataTemplate x:Key="ProductDataTemplate">
+            <StackPanel>
+                <!--<TextBlock Text="{Binding Path=Name}" FontFamily="Arial" FontWeight="Bold"></TextBlock>-->
+                <TextBlock FontFamily="Arial" FontWeight="Bold">
+                    <TextBlock.Text>
+                        <MultiBinding Converter="{StaticResource NameConverter}">
+                            <Binding Path="Name"></Binding>
+                            <Binding Path="Brand"></Binding>
+                        </MultiBinding>
+                    </TextBlock.Text>
+                </TextBlock>
+                <TextBlock Text="{Binding Path=Description, TargetNullValue='**DESCRIPTION NOT FOUND**'}"></TextBlock>
+                <TextBlock Text="{Binding Path=Price, StringFormat='C'}" Foreground="{Binding Path=Price, Converter={StaticResource PriceConverter}}"></TextBlock>
+            </StackPanel>
+        </DataTemplate>
     </Window.Resources>
     
     <Grid>
-        <StackPanel>
-            <TextBlock Text="{Binding Source={StaticResource product1}, Path=Name, Mode=OneWay}"></TextBlock>
-            <TextBlock Text="{Binding Source={StaticResource product1}, Path=Description, Mode=OneWay}"></TextBlock>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition></RowDefinition>
+        </Grid.RowDefinitions>
 
-        </StackPanel>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+
+        <Grid Grid.Row="0" Background="AliceBlue">
+            <TextBlock Text="{Binding Products.Count, FallbackValue='Haz clic en el botón para agregar un producto', StringFormat='Lista de Valores ({0})'}"></TextBlock>
+            <Button Content="Agregar" Width="100" Height="20" Click="Button_Click_1" HorizontalAlignment="Right"></Button>
+        </Grid>
+
+        <!--<TextBox Text="{Binding Source={StaticResource product1}, Path=Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+            <TextBox Text="{Binding Source={StaticResource product1}, Path=Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>-->
+
+        <ListBox ItemsSource="{Binding Products}" ItemTemplate="{StaticResource ProductDataTemplate}" Grid.Row="1">
+            <!--<ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel>
+                        <TextBlock Text="{Binding Path=Name}" FontFamily="Arial" FontWeight="Bold"></TextBlock>
+                        <TextBlock Text="{Binding Path=Description}"></TextBlock>
+                        <TextBlock Text="{Binding Path=Price, StringFormat='C'}"></TextBlock>
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>-->
+        </ListBox>
+        
     </Grid>
 </Window>
